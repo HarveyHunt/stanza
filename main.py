@@ -19,6 +19,7 @@ class Stanza():
     
     def run(self):
         player_thread = Thread(target=self.monitor_player)
+        player_thread.daemon = True
         player_thread.start()
         self.ui.run()
 
@@ -40,6 +41,7 @@ class Stanza():
                             md_thread = Thread(target=self.md.get('lyrics',
                                 self.status['artist'], self.status['album'],
                                 self.status['title']))
+                            md_thread.daemon = True
                             md_thread.start()
                 self.status = self.player.status
             if self.lyrics != self.md.lyrics:

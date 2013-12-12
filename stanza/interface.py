@@ -41,9 +41,15 @@ class StanzaUI():
         self.footer_format = self.conf['footer_format']
         self.simple_list = urwid.SimpleListWalker([])
         self.listbox = LyricListBox(self.simple_list)
+
+        frame_header = urwid.Pile([urwid.AttrWrap(self.header, 'header'),
+                    urwid.Divider(div_char=self.conf['header_div_char'])])
+        frame_footer = urwid.Pile([urwid.Divider(div_char=
+                    self.conf['footer_div_char']), 
+                    urwid.AttrWrap(self.footer, 'footer')])
+
         self.view = urwid.Frame(urwid.AttrWrap(self.listbox, 'body'), 
-                header=urwid.AttrWrap(self.header, 'header'),
-                footer=urwid.AttrWrap(self.footer, 'footer'))
+                header=frame_header, footer=frame_footer)
         palette = self._generate_palette()
         self.loop = urwid.MainLoop(self.view, palette,
                                     unhandled_input=self._keystroke)
@@ -65,11 +71,11 @@ class StanzaUI():
 
     def _set_bar_data(self, bar, data, refresh=True):
         if bar is 'header':
-            formatting = self.header_format
+            markup = self.header_format
         else:
-            formatting = self.footer_format
-        markup = ''.join({formatting.replace('<' + k + '>', str(v))
-                        for k, v in data.items()})
+            markup = self.footer_format
+        for k, v in data.items():
+            markup = markup.replace('<' + k + '>', str(v))
         if bar is 'header':
             self.header.set_text(markup)
         else:
