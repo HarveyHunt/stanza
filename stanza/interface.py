@@ -2,15 +2,23 @@ import urwid
 
 class TextLine(urwid.WidgetWrap):
     
-    def __init__(self, line_number, max_line_length, text, alt_line):
+    def __init__(self, line_number, max_line_length, text, alt_line,
+            line_num_sep_char, line_num_sep_width):
         if alt_line and line_number % 2:
-            self.content = [('fixed', max_line_length, urwid.AttrWrap(
-                urwid.Text(str(line_number), align='right'), 'list_num')),
-                urwid.AttrWrap(urwid.Text(text), 'list_text')]
+            alt = True
         else:
-            self.content = [('fixed', max_line_length, urwid.AttrWrap(
-                urwid.Text(str(line_number), align='right'), 'list_num_alt')),
-                urwid.AttrWrap(urwid.Text(text), 'list_text_alt')]
+            alt = False
+        self.content = []
+        # Add in the line numbers.
+        self.content.append(('fixed', max_line_length, urwid.AttrWrap(
+            urwid.Text(str(line_number), align='right'),
+            'list_num_alt' if alt else 'list_num')))
+        # Add in the seperator between the line numbers and the text.
+        self.content.append(('fixed', line_num_sep_width,
+                urwid.AttrWrap(urwid.Text(line_num_sep_char), 'line_num_sep')))
+        # Add the line of text.
+        self.content.append(urwid.AttrWrap(urwid.Text(text),
+            'list_text_alt' if alt else 'list_text'))
 
         widg = urwid.Columns(self.content)
         super().__init__(widg)
@@ -88,7 +96,9 @@ class StanzaUI():
         data = data.split('\n')
         max_lines = len(str(len(data)))
         self.simple_list.contents[:] = [TextLine(i, max_lines, text,
-                                    self.conf['alt_list']) for i,
+                                    self.conf['alt_list'],
+                                    self.conf['line_num_sep_char'],
+                                    self.conf['line_num_sep_width']) for i,
                                     text in enumerate(data)]
         if refresh:
             self.loop.draw_screen()
