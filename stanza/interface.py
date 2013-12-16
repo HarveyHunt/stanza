@@ -41,6 +41,7 @@ class LyricListBox(urwid.ListBox):
 class StanzaUI():
 
     def __init__(self, config):
+        self.is_dirty = False
         self.conf = config
 
         self.header = urwid.Text('')
@@ -90,7 +91,7 @@ class StanzaUI():
             self.footer.set_text(markup)
 
         if refresh:
-            self.loop.draw_screen()
+            self.is_dirty = True
         
     def set_listbox_data(self, data, refresh=True):
         data = data.split('\n')
@@ -101,7 +102,7 @@ class StanzaUI():
                                     self.conf['line_num_sep_width']) for i,
                                     text in enumerate(data)]
         if refresh:
-            self.loop.draw_screen()
+            self.is_dirty = True
 
     def set_footer_data(self, data, refresh=True):
         self._set_bar_data('footer', data, refresh)

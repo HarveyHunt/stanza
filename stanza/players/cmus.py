@@ -12,7 +12,7 @@ class Player():
         else:
             return False
 
-    def check_status(self):
+    def update_status(self):
         self.status = {'artist': None, 'album': None, 'title': None,
                         'vol_left': None, 'vol_right': None, 'playing': False,
                         'duration': 0, 'position': 0, 'repeat': False,
