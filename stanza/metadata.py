@@ -2,6 +2,7 @@ import time
 import plyr
 from stanza import __version__
 
+
 class MetaData():
 
     def __init__(self, config):
@@ -13,7 +14,7 @@ class MetaData():
 
     def _query(self, get_type, artist, album, title):
         qry = plyr.Query(get_type=get_type, artist=artist, album=album,
-                            title=title)
+                         title=title)
         qry.useragent = self.useragent
         qry.database = self.db
         qry.timeout = self.timeout

@@ -2,6 +2,7 @@ import os.path
 import imp
 import glob
 
+
 def find_player(conf):
     player_folder = os.path.join(os.getcwd(), 'players')
     conf = {}
@@ -17,6 +18,7 @@ def find_player(conf):
                 return player
         else:
             return None
+
 
 def _load_player(player_name, player_folder):
     player_path = os.path.join(player_folder, player_name + '.py')

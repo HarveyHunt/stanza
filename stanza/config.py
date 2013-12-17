@@ -7,7 +7,7 @@ class Config():
 
     def __init__(self):
         self.folderPaths = [os.path.join(os.path.expanduser('~'),
-                        '.config/stanza'), '/etc/stanza']
+                                         '.config/stanza'), '/etc/stanza']
         for path in self.folderPaths:
             if os.path.isdir(path):
                 self._folderPath = path
@@ -31,8 +31,10 @@ class Config():
 
     def reload(self):
         self._conf.read(self._confFilePath)
-        self.general = self._replaceDataTypes(dict(self._conf.items('general')))
-        self.interface = self._replaceDataTypes(dict(self._conf.items('interface')))
+        self.general = self._replaceDataTypes(
+            dict(self._conf.items('general')))
+        self.interface = self._replaceDataTypes(
+            dict(self._conf.items('interface')))
 
     def _replaceDataTypes(self, dictionary):
         """
@@ -41,8 +43,9 @@ class Config():
 
         dictionary: A dictionary returned from the config file.
         """
-        loggingLevels = {'NONE': 0, 'NULL': 0, 'DEBUG': 10, 'INFO': 20, 'WARNING': 30,
-                         'ERROR': 40, 'CRITICAL': 50}
+        loggingLevels = {
+            'NONE': 0, 'NULL': 0, 'DEBUG': 10, 'INFO': 20, 'WARNING': 30,
+            'ERROR': 40, 'CRITICAL': 50}
         for k, v in dictionary.items():
             if v in ['true', 'True', 'on']:
                 dictionary[k] = True
