@@ -60,8 +60,10 @@ class StanzaUI():
         self.view = urwid.Frame(urwid.AttrWrap(self.listbox, 'body'), 
                 header=frame_header, footer=frame_footer)
         palette = self._generate_palette()
-        self.loop = urwid.MainLoop(self.view, palette,
+        self.loop = urwid.MainLoop(self.view, palette=palette,
                                     unhandled_input=self._keystroke)
+        self.loop.screen.set_terminal_properties(colors=
+                                        self.conf['terminal_colours'])
 
     def _keystroke(self, key):
         if key is 'q':
