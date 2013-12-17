@@ -102,11 +102,9 @@ class StanzaUI():
         max_lines = len(str(len(data)))
         self.simple_list.contents[:] = [TextLine(i, max_lines, text,
                                                  self.conf['alt_list'],
-                                                 self.conf[
-                                                     'line_num_sep_char'],
-                                                 self.conf[
-                                                     'line_num_sep_width']) for i,
-                                        text in enumerate(data)]
+                                                 self.conf['line_num_sep_char'],
+                                                 self.conf['line_num_sep_width'])
+                                                 for i, text in enumerate(data)]
         if refresh:
             self.is_dirty = True
 

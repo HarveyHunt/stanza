@@ -41,10 +41,8 @@ class Stanza():
                             self.status['album'] = self.player.status['album']
                             self.status['title'] = self.player.status['title']
                             Thread(target=self.md.get, args=('lyrics',
-                                                             self.status[
-                                                                 'artist'],
-                                                             self.status[
-                                                                 'album'],
+                                                             self.status['artist'],
+                                                             self.status['album'],
                                                              self.status['title'])).start()
                 self.status = self.player.status
             if self.lyrics != self.md.lyrics:
