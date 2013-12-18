@@ -33,7 +33,6 @@ class Stanza():
             if self.status != self.player.status:
                 self.ui.footer.set_data(self.player.status)
                 self.ui.header.set_data(self.player.status)
-                self.ui.is_dirty = True
                 if self.status['artist'] != self.player.status['artist'] or \
                         self.status['album'] != self.player.status['album'] or \
                         self.status['title'] != self.player.status['title']:

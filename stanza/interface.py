@@ -31,6 +31,8 @@ class TextLine(urwid.WidgetWrap):
 
 class Bar(urwid.WidgetWrap):
 
+    signals = ['changed']
+
     def __init__(self, formatting, attr_name):
         contents = []
         if '<progress>' in formatting:
@@ -38,8 +40,10 @@ class Bar(urwid.WidgetWrap):
             self._end_formatting = formatting.split('<progress>')[1].lstrip()
             self._prog = urwid.ProgressBar(attr_name + '_prog_normal',
                                         attr_name + '_prog_complete')
-            self._start_text = urwid.Text('') if self._start_formatting != '' else None
-            self._end_text = urwid.Text('') if self._end_formatting != '' else None
+            self._start_text = urwid.Text('', align='left') if \
+                                    self._start_formatting != '' else None
+            self._end_text = urwid.Text('', align='right') if \
+                                    self._end_formatting != '' else None
 
             if self._start_text:
                 contents.append(urwid.AttrWrap(self._start_text, attr_name))
@@ -52,7 +56,6 @@ class Bar(urwid.WidgetWrap):
 
             contents.append(urwid.AttrWrap(self._text, attr_name))
         widg = urwid.Columns(contents)
-        widg.options(width_type='pack')
         super().__init__(widg)
 
     def set_data(self, data):
@@ -65,6 +68,7 @@ class Bar(urwid.WidgetWrap):
             self._set_text_only(self._end_text, self._end_formatting, data)
         
         self._prog.set_completion((int(data['position']) / int(data['duration'])) * 100)
+        self._emit('changed')
 
     def _set_text_only(self, text_obj, formatting, data):
         for k, v in data.items():
@@ -109,6 +113,8 @@ class StanzaUI():
 
         self.header = Bar(self.conf['header_format'], 'header')
         self.footer = Bar(self.conf['footer_format'], 'footer')
+        urwid.connect_signal(self.header, 'changed', self._mark_dirty)
+        urwid.connect_signal(self.footer, 'changed', self._mark_dirty)
         self.simple_list = urwid.SimpleListWalker([])
         self.listbox = LyricListBox(self.simple_list)
 
@@ -132,6 +138,9 @@ class StanzaUI():
 
     def run(self):
         self.loop.run()
+
+    def _mark_dirty(self):
+        self.is_dirty = True
 
     def _generate_palette(self):
         pal = []
