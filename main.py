@@ -31,8 +31,9 @@ class Stanza():
                 exit()
             self.player.update_status()
             if self.status != self.player.status:
-                self.ui.set_footer_data(self.player.status)
-                self.ui.set_header_data(self.player.status)
+                self.ui.footer.set_data(self.player.status)
+                self.ui.header.set_data(self.player.status)
+                self.ui.loop.draw_screen()
                 if self.status['artist'] != self.player.status['artist'] or \
                         self.status['album'] != self.player.status['album'] or \
                         self.status['title'] != self.player.status['title']:

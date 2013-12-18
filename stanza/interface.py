@@ -1,3 +1,4 @@
+import datetime
 import urwid
 
 
@@ -9,23 +10,80 @@ class TextLine(urwid.WidgetWrap):
             alt = True
         else:
             alt = False
-        self.content = []
+        content = []
         # Add in the line numbers.
-        self.content.append(('fixed', max_line_length, urwid.AttrWrap(
+        content.append(('fixed', max_line_length, urwid.AttrWrap(
             urwid.Text(str(line_number), align='right'),
             'list_num_alt' if alt else 'list_num')))
         # Add in the seperator between the line numbers and the text.
-        self.content.append(('fixed', line_num_sep_width,
+        content.append(('fixed', line_num_sep_width,
                              urwid.AttrWrap(urwid.Text(line_num_sep_char), 'line_num_sep')))
         # Add the line of text.
-        self.content.append(urwid.AttrWrap(urwid.Text(text),
+        content.append(urwid.AttrWrap(urwid.Text(text),
                                            'list_text_alt' if alt else 'list_text'))
 
-        widg = urwid.Columns(self.content)
+        widg = urwid.Columns(content)
         super().__init__(widg)
 
     def selectable(self):
         return False
+
+
+class Bar(urwid.WidgetWrap):
+
+    def __init__(self, formatting, attr_name):
+        contents = []
+        if '<progress>' in formatting:
+            self._start_formatting = formatting.split('<progress>')[0].rstrip()
+            self._end_formatting = formatting.split('<progress>')[1].lstrip()
+            self._prog = urwid.ProgressBar('pg normal', 'pg complete')
+            self._start_text = urwid.Text('') if self._start_formatting != '' else None
+            self._end_text = urwid.Text('') if self._end_formatting != '' else None
+
+            if self._start_text:
+                contents.append(urwid.AttrWrap(self._start_text, attr_name))
+            contents.append(urwid.AttrWrap(self._prog, attr_name + '_prog'))
+            if self._end_text:
+                contents.append(urwid.AttrWrap(self._end_text, attr_name))
+        else:
+            self._formatting = formatting
+            self._text = urwid.Text('')
+
+            contents.append(urwid.AttrWrap(self._text, attr_name))
+        widg = urwid.Columns(contents)
+        super().__init__(widg)
+
+    def set_data(self, data):
+        if hasattr(self, '_text') and self._text is not None:
+            self._set_text_only(self._text, self._formatting, data)
+            return
+        if hasattr(self, '_start_text') and self._start_text is not None:
+            self._set_text_only(self._start_text, self._start_formatting, data)
+        if hasattr(self, '_end_text') and self._end_text is not None:
+            self._set_text_only(self._end_text, self._end_formatting, data)
+        
+        self._prog.set_completion((int(data['position']) / int(data['duration'])) * 100)
+
+    def _set_text_only(self, text_obj, formatting, data):
+        for k, v in data.items():
+            if k in ['duration', 'position']:
+                formatting = formatting.replace('<' + k + '>',
+                        self._convert_time(v))
+            else:
+                formatting = formatting.replace('<' + k + '>', str(v))
+        text_obj.set_text(formatting)
+
+    def _convert_time(self, time):
+        """
+        A helper function to convert seconds into hh:mm:ss for better
+        readability.
+
+        time: A string representing time in seconds.
+        """
+        time_string = str(datetime.timedelta(seconds=int(time)))
+        if time_string.split(':')[0] == '0':
+            time_string = time_string.partition(':')[2]
+        return time_string
 
 
 class LyricListBox(urwid.ListBox):
@@ -47,18 +105,16 @@ class StanzaUI():
         self.is_dirty = False
         self.conf = config
 
-        self.header = urwid.Text('')
-        self.footer = urwid.Text('')
-        self.header_format = self.conf['header_format']
-        self.footer_format = self.conf['footer_format']
+        self.header = Bar(self.conf['header_format'], 'header')
+        self.footer = Bar(self.conf['footer_format'], 'footer')
         self.simple_list = urwid.SimpleListWalker([])
         self.listbox = LyricListBox(self.simple_list)
 
-        frame_header = urwid.Pile([urwid.AttrWrap(self.header, 'header'),
+        frame_header = urwid.Pile([self.header,
                                    urwid.Divider(div_char=self.conf['header_div_char'])])
         frame_footer = urwid.Pile([urwid.Divider(div_char=
                                                  self.conf['footer_div_char']),
-                                   urwid.AttrWrap(self.footer, 'footer')])
+                                   self.footer])
 
         self.view = urwid.Frame(urwid.AttrWrap(self.listbox, 'body'),
                                 header=frame_header, footer=frame_footer)
@@ -82,21 +138,6 @@ class StanzaUI():
                 pal.append(tuple([setting.split('_col')[0]] + value))
         return pal
 
-    def _set_bar_data(self, bar, data, refresh=True):
-        if bar is 'header':
-            markup = self.header_format
-        else:
-            markup = self.footer_format
-        for k, v in data.items():
-            markup = markup.replace('<' + k + '>', str(v))
-        if bar is 'header':
-            self.header.set_text(markup)
-        else:
-            self.footer.set_text(markup)
-
-        if refresh:
-            self.is_dirty = True
-
     def set_listbox_data(self, data, refresh=True):
         data = data.split('\n')
         max_lines = len(str(len(data)))
@@ -107,9 +148,3 @@ class StanzaUI():
                                                  for i, text in enumerate(data)]
         if refresh:
             self.is_dirty = True
-
-    def set_footer_data(self, data, refresh=True):
-        self._set_bar_data('footer', data, refresh)
-
-    def set_header_data(self, data, refresh=True):
-        self._set_bar_data('header', data, refresh)
