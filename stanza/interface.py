@@ -20,7 +20,7 @@ class TextLine(urwid.WidgetWrap):
                              urwid.AttrWrap(urwid.Text(line_num_sep_char), 'line_num_sep')))
         # Add the line of text.
         content.append(urwid.AttrWrap(urwid.Text(text),
-                                           'list_text_alt' if alt else 'list_text'))
+                                    'list_text_alt' if alt else 'list_text'))
 
         widg = urwid.Columns(content)
         super().__init__(widg)
@@ -36,13 +36,14 @@ class Bar(urwid.WidgetWrap):
         if '<progress>' in formatting:
             self._start_formatting = formatting.split('<progress>')[0].rstrip()
             self._end_formatting = formatting.split('<progress>')[1].lstrip()
-            self._prog = urwid.ProgressBar('pg normal', 'pg complete')
+            self._prog = urwid.ProgressBar(attr_name + '_prog_normal',
+                                        attr_name + '_prog_complete')
             self._start_text = urwid.Text('') if self._start_formatting != '' else None
             self._end_text = urwid.Text('') if self._end_formatting != '' else None
 
             if self._start_text:
                 contents.append(urwid.AttrWrap(self._start_text, attr_name))
-            contents.append(urwid.AttrWrap(self._prog, attr_name + '_prog'))
+            contents.append(self._prog)
             if self._end_text:
                 contents.append(urwid.AttrWrap(self._end_text, attr_name))
         else:
@@ -51,6 +52,7 @@ class Bar(urwid.WidgetWrap):
 
             contents.append(urwid.AttrWrap(self._text, attr_name))
         widg = urwid.Columns(contents)
+        widg.options(width_type='pack')
         super().__init__(widg)
 
     def set_data(self, data):
