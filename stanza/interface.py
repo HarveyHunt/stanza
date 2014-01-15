@@ -134,7 +134,7 @@ class stanza_ui():
 
     def _keystroke(self, key):
         if key is 'q':
-            raise urwid.exitMainLoop()
+            raise urwid.ExitMainLoop()
 
     def run(self):
         self.loop.run()
