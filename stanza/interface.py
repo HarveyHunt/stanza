@@ -3,6 +3,10 @@ import urwid
 
 
 class TextLine(urwid.WidgetWrap):
+    '''
+    A line that will be inside of the LyricListBox. Line colours can be 
+    alternating.
+    '''
 
     def __init__(self, line_number, max_line_length, text, alt_line,
                  line_num_sep_char, line_num_sep_width):
@@ -30,6 +34,13 @@ class TextLine(urwid.WidgetWrap):
 
 
 class Bar(urwid.WidgetWrap):
+    '''
+    To be used as a Header or Footer for a Frame. It inherits from WidgetWrap
+    so that other widgets can be embedded in it- such as ProgressBars.
+
+    Accepts a format string that specifies how information should be presented,
+    such as: <artist> <progress> <title>
+    '''
 
     signals = ['changed']
 
@@ -59,6 +70,9 @@ class Bar(urwid.WidgetWrap):
         super().__init__(widg)
 
     def set_data(self, data):
+        '''
+        Updates the data displayed in the bar.
+        '''
         if hasattr(self, '_text') and self._text is not None:
             self._set_text_only(self._text, self._formatting, data)
             return
@@ -71,6 +85,10 @@ class Bar(urwid.WidgetWrap):
         self._emit('changed')
 
     def _set_text_only(self, text_obj, formatting, data):
+        '''
+        A way to replace key words in the formatting string with their actual
+        values- as reported by the Player class.
+        '''
         for k, v in data.items():
             if k in ['duration', 'position']:
                 formatting = formatting.replace('<' + k + '>',
@@ -92,7 +110,10 @@ class Bar(urwid.WidgetWrap):
         return time_string
 
 
-class lyric_ListBox(urwid.ListBox):
+class LyricListBox(urwid.ListBox):
+    '''
+    Stores all of the TextLine objects and implements key mappings.
+    '''
 
     def __init__(self, body):
         super().__init__(body)
@@ -105,7 +126,11 @@ class lyric_ListBox(urwid.ListBox):
         return super().keypress(size, key)
 
 
-class StanzaUI():
+class StanzaUI:
+    '''
+    Main UI class that ties together all of the UI aspects that were specified
+    earlier.
+    '''
 
     def __init__(self, config):
         self.is_dirty = False
@@ -116,7 +141,7 @@ class StanzaUI():
         urwid.connect_signal(self.header, 'changed', self._mark_dirty)
         urwid.connect_signal(self.footer, 'changed', self._mark_dirty)
         self.simple_list = urwid.SimpleListWalker([])
-        self.listbox = lyric_ListBox(self.simple_list)
+        self.listbox = LyricListBox(self.simple_list)
 
         frame_header = urwid.Pile([self.header,
                                    urwid.Divider(div_char=self.conf['header_div_char'])])
@@ -133,16 +158,31 @@ class StanzaUI():
                                                  self.conf['terminal_colours'])
 
     def _keystroke(self, key):
+        '''
+        The handler for unhandled input.
+        '''
         if key is 'q':
             raise urwid.ExitMainLoop()
 
     def run(self):
+        '''
+        And so it begins...
+        '''
         self.loop.run()
 
     def _mark_dirty(self, _=None):
+        '''
+        Called when the Bar class emits a 'changed' signal. If the UI is marked
+        as dirty, it will be redrawn. This allows redraws to be batched
+        together.
+        '''
         self.is_dirty = True
 
     def _generate_palette(self):
+        '''
+        Creates a palette based upon the values defined in the configuration
+        file.
+        '''
         pal = []
         for setting, value in self.conf.items():
             if setting.endswith('_col') and value is not '':
@@ -150,6 +190,9 @@ class StanzaUI():
         return pal
 
     def set_listbox_data(self, data, refresh=True):
+        '''
+        Updates the contents of the LyricListBox.
+        '''
         data = data.split('\n')
         max_lines = len(str(len(data)))
         self.simple_list.contents[:] = [TextLine(i + 1, max_lines, text,

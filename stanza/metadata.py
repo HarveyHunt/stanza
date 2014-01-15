@@ -3,7 +3,11 @@ import plyr
 from stanza import __version__
 
 
-class Metadata():
+class Metadata:
+    '''
+    Handles all of the metadata for a track, as well as fetching new
+    metadata.
+    '''
 
     def __init__(self, config):
         self.db = plyr.Database(config['db_path'])
@@ -13,6 +17,9 @@ class Metadata():
         self.lyrics = ''
 
     def _query(self, get_type, artist, album, title):
+        '''
+        Query glyr for track metadata and store it in a database.
+        '''
         qry = plyr.Query(get_type=get_type, artist=artist, album=album,
                          title=title)
         qry.useragent = self.useragent
@@ -23,6 +30,11 @@ class Metadata():
         return qry.commit()
 
     def get(self, get_type, artist, album, title):
+        '''
+        Get the details for a song. This function is usually invoked in its
+        own thread, hence it checks that it is the most recent query by using
+        timestamps.
+        '''
         self.lyrics = 'Searching...'
         self.last_query = time.time()
         last_query_time = self.last_query

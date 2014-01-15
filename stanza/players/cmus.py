@@ -2,18 +2,27 @@ import subprocess
 import datetime
 
 
-class Player():
-
-    def __init__(self):
-        pass
+class Player:
+    '''
+    Handles all of the actions relating to the cmus player, such as playing
+    tracks as well as getting the current status of the player.
+    '''
 
     def is_running(self):
+        '''
+        It is important for the rest of the application to be aware as to
+        whether or not a player is running.
+        '''
         if subprocess.call(['cmus-remote', '-C']) == 0:
             return True
         else:
             return False
 
     def update_status(self):
+        '''
+        Updates the contents of the status dictionary with the most recent
+        output from cmus.
+        '''
         self.status = {'artist': None, 'album': None, 'title': None,
                        'vol_left': None, 'vol_right': None, 'playing': False,
                        'duration': 0, 'position': 0, 'repeat': False,
@@ -28,6 +37,10 @@ class Player():
             self.status[key] = cmus_status[key]
 
     def send_cmd(self, cmd):
+        '''
+        Provides a uniform way for the application to send commands to cmus
+        and other players.
+        '''
         command = {
             'play': '-p',
             'pause': '-u',

@@ -4,6 +4,9 @@ import errno
 
 
 class Config:
+    '''
+    Manages configuration of the application.
+    '''
 
     def __init__(self):
         self.folder_paths = [os.path.join(os.path.expanduser('~'),
@@ -23,6 +26,9 @@ class Config:
         self.reload()
 
     def _touchdir(self, path):
+        '''
+        Create a directory if it doesn't exist.
+        '''
         try:
             os.makedirs(path)
         except OSError as e:
@@ -30,6 +36,9 @@ class Config:
                     raise
 
     def reload(self):
+        '''
+        Reload the categories of configuration.
+        '''
         self._conf.read(self._conf_file_path)
         self.general = self._replace_data_types(
             dict(self._conf.items('general')))
