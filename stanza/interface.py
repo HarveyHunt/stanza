@@ -62,10 +62,10 @@ class Bar(urwid.WidgetWrap):
             if self._end_text:
                 contents.append(urwid.AttrWrap(self._end_text, attr_name))
         else:
-            self._formatting = formatting
-            self._text = urwid.Text('')
+            self._start_formatting = formatting
+            self._start_text = urwid.Text('')
+            contents.append(urwid.AttrWrap(self._start_text, attr_name))
 
-            contents.append(urwid.AttrWrap(self._text, attr_name))
         widg = urwid.Columns(contents)
         super().__init__(widg)
 
@@ -73,15 +73,13 @@ class Bar(urwid.WidgetWrap):
         '''
         Updates the data displayed in the bar.
         '''
-        if hasattr(self, '_text') and self._text is not None:
-            self._set_text_only(self._text, self._formatting, data)
-            return
         if hasattr(self, '_start_text') and self._start_text is not None:
             self._set_text_only(self._start_text, self._start_formatting, data)
         if hasattr(self, '_end_text') and self._end_text is not None:
             self._set_text_only(self._end_text, self._end_formatting, data)
+        if hasattr(self, '_prog'):
+            self._prog.set_completion((int(data['position']) / int(data['duration'])) * 100)
         
-        self._prog.set_completion((int(data['position']) / int(data['duration'])) * 100)
         self._emit('changed')
 
     def _set_text_only(self, text_obj, formatting, data):

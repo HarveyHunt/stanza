@@ -30,7 +30,7 @@ class Player:
         # Setting stderr to subprocess.STDOUT seems to stop the error
         # message returned by the process from being output to STDOUT.
         cmus_output = subprocess.check_output(['cmus-remote', '-Q'],
-                                              stderr=subprocess.STDOUT).decode('utf-8')
+                                    stderr=subprocess.STDOUT).decode('utf-8')
 
         cmus_status = self.convert_cmus_output(cmus_output)
         for key in self.status:
