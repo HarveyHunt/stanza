@@ -7,7 +7,7 @@ class Stanza():
 
     def __init__(self):
         self.config = config.Config()
-        self.ui = interface.stanza_ui(self.config.interface)
+        self.ui = interface.StanzaUI(self.config.interface)
         self.player = player.find_player(self.config.general)
         self.status = {'artist': None, 'album': None, 'title': None,
                        'vol_left': None, 'vol_right': None, 'playing': False,
@@ -26,6 +26,17 @@ class Stanza():
         self.ui.run()
 
     def monitor_player(self):
+
+        def status_mismatch():
+            return self.status['artist'] != self.player.status['artist'] or \
+            self.status['album'] != self.player.status['album'] or \
+            self.status['title'] != self.player.status['title']
+
+        def update_status():
+            self.status['artist'] = self.player.status['artist']
+            self.status['album'] = self.player.status['album']
+            self.status['title'] = self.player.status['title']
+
         while True:
             if not self.player.is_running():
                 exit()
@@ -33,17 +44,12 @@ class Stanza():
             if self.status != self.player.status:
                 self.ui.footer.set_data(self.player.status)
                 self.ui.header.set_data(self.player.status)
-                if self.status['artist'] != self.player.status['artist'] or \
-                        self.status['album'] != self.player.status['album'] or \
-                        self.status['title'] != self.player.status['title']:
-                            self.status[
-                                'artist'] = self.player.status['artist']
-                            self.status['album'] = self.player.status['album']
-                            self.status['title'] = self.player.status['title']
-                            Thread(target=self.md.get, args=('lyrics',
-                                                             self.status['artist'],
-                                                             self.status['album'],
-                                                             self.status['title'])).start()
+                if status_mismatch():
+                    update_status()
+                    Thread(target=self.md.get, args=('lyrics',
+                                                        self.status['artist'],
+                                                        self.status['album'],
+                                                        self.status['title'])).start()
                 self.status = self.player.status
             if self.lyrics != self.md.lyrics:
                 self.lyrics = self.md.lyrics

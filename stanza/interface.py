@@ -105,7 +105,7 @@ class lyric_ListBox(urwid.ListBox):
         return super().keypress(size, key)
 
 
-class stanza_ui():
+class StanzaUI():
 
     def __init__(self, config):
         self.is_dirty = False
