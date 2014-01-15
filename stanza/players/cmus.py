@@ -1,12 +1,17 @@
 import subprocess
-import datetime
 
 
-class Player:
+class Player(object):
     '''
     Handles all of the actions relating to the cmus player, such as playing
     tracks as well as getting the current status of the player.
     '''
+
+    def __init__(self):
+        self.status = {'artist': None, 'album': None, 'title': None,
+                       'vol_left': None, 'vol_right': None, 'playing': False,
+                       'duration': 0, 'position': 0, 'repeat': False,
+                       'shuffle': False}
 
     def is_running(self):
         '''
@@ -23,10 +28,6 @@ class Player:
         Updates the contents of the status dictionary with the most recent
         output from cmus.
         '''
-        self.status = {'artist': None, 'album': None, 'title': None,
-                       'vol_left': None, 'vol_right': None, 'playing': False,
-                       'duration': 0, 'position': 0, 'repeat': False,
-                       'shuffle': False}
         # Setting stderr to subprocess.STDOUT seems to stop the error
         # message returned by the process from being output to STDOUT.
         cmus_output = subprocess.check_output(['cmus-remote', '-Q'],

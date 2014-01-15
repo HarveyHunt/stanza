@@ -3,7 +3,7 @@ import time
 from threading import Thread
 
 
-class Stanza:
+class Stanza(object):
     '''
     The main application class, ties together all of the subsystems and
     manages them.
@@ -66,8 +66,7 @@ class Stanza:
                 self.ui.header.set_data(self.player.status)
                 if status_mismatch():
                     update_status()
-                    Thread(target=self.md.get, args=('lyrics',
-                                                self.status['artist'],
+                    Thread(target=self.md.get, args=(self.status['artist'],
                                                 self.status['album'],
                                                 self.status['title'])).start()
                 self.status = self.player.status

@@ -3,6 +3,16 @@ import os.path
 import errno
 
 
+def _touchdir(path):
+    '''
+    Create a directory if it doesn't exist.
+    '''
+    try:
+        os.makedirs(path)
+    except OSError as error:
+        if error.errno != errno.EEXIST:
+            raise
+
 class Config:
     '''
     Manages configuration of the application.
@@ -17,23 +27,13 @@ class Config:
                 break
         else:
             self._folder_path = self.folder_paths[0]
-            self._touchdir(self._folder_path)
+            _touchdir(self._folder_path)
 
         self._conf = configparser.SafeConfigParser()
         # A weird trick to retain the case of sections and keys.
         self._conf.optionxform = str
         self._conf_file_path = os.path.join(self._folder_path, 'config')
         self.reload()
-
-    def _touchdir(self, path):
-        '''
-        Create a directory if it doesn't exist.
-        '''
-        try:
-            os.makedirs(path)
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                    raise
 
     def reload(self):
         '''

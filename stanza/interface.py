@@ -4,7 +4,7 @@ import urwid
 
 class TextLine(urwid.WidgetWrap):
     '''
-    A line that will be inside of the LyricListBox. Line colours can be 
+    A line that will be inside of the LyricListBox. Line colours can be
     alternating.
     '''
 
@@ -79,7 +79,7 @@ class Bar(urwid.WidgetWrap):
             self._set_text_only(self._end_text, self._end_formatting, data)
         if hasattr(self, '_prog'):
             self._prog.set_completion((int(data['position']) / int(data['duration'])) * 100)
-        
+
         self._emit('changed')
 
     def _set_text_only(self, text_obj, formatting, data):
@@ -124,7 +124,7 @@ class LyricListBox(urwid.ListBox):
         return super().keypress(size, key)
 
 
-class StanzaUI:
+class StanzaUI(object):
     '''
     Main UI class that ties together all of the UI aspects that were specified
     earlier.

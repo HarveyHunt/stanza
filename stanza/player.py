@@ -5,7 +5,7 @@ import glob
 def find_player(conf):
     '''
     Locates the folder containing the player files. The default player
-    (as defined in the configuration file) is loaded in order for 
+    (as defined in the configuration file) is loaded in order for
     it to handle player specific details- such as getting its status.
     '''
     player_folder = os.path.join(os.getcwd(), 'stanza', 'players')

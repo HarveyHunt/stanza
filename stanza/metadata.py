@@ -3,7 +3,7 @@ import plyr
 from stanza import __version__
 
 
-class Metadata:
+class Metadata(object):
     '''
     Handles all of the metadata for a track, as well as fetching new
     metadata.
@@ -29,7 +29,7 @@ class Metadata:
         qry.normalize = ('aggressive', 'artist', 'album', 'title')
         return qry.commit()
 
-    def get(self, get_type, artist, album, title):
+    def get(self, artist, album, title):
         '''
         Get the details for a song. This function is usually invoked in its
         own thread, hence it checks that it is the most recent query by using
