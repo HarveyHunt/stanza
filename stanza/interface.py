@@ -42,7 +42,7 @@ class Bar(urwid.WidgetWrap):
                                         attr_name + '_prog_complete')
             self._start_text = urwid.Text('', align='left') if \
                                     self._start_formatting != '' else None
-            self._end_text = urwid.Text('', align='right') if \
+            self._end_text = urwid.Text(' ', align='right') if \
                                     self._end_formatting != '' else None
 
             if self._start_text:
@@ -92,7 +92,7 @@ class Bar(urwid.WidgetWrap):
         return time_string
 
 
-class LyricListBox(urwid.ListBox):
+class lyric_ListBox(urwid.ListBox):
 
     def __init__(self, body):
         super().__init__(body)
@@ -105,7 +105,7 @@ class LyricListBox(urwid.ListBox):
         return super().keypress(size, key)
 
 
-class StanzaUI():
+class stanza_ui():
 
     def __init__(self, config):
         self.is_dirty = False
@@ -116,7 +116,7 @@ class StanzaUI():
         urwid.connect_signal(self.header, 'changed', self._mark_dirty)
         urwid.connect_signal(self.footer, 'changed', self._mark_dirty)
         self.simple_list = urwid.SimpleListWalker([])
-        self.listbox = LyricListBox(self.simple_list)
+        self.listbox = lyric_ListBox(self.simple_list)
 
         frame_header = urwid.Pile([self.header,
                                    urwid.Divider(div_char=self.conf['header_div_char'])])
@@ -134,12 +134,12 @@ class StanzaUI():
 
     def _keystroke(self, key):
         if key is 'q':
-            raise urwid.ExitMainLoop()
+            raise urwid.exitMainLoop()
 
     def run(self):
         self.loop.run()
 
-    def _mark_dirty(self):
+    def _mark_dirty(self, _=None):
         self.is_dirty = True
 
     def _generate_palette(self):
@@ -152,7 +152,7 @@ class StanzaUI():
     def set_listbox_data(self, data, refresh=True):
         data = data.split('\n')
         max_lines = len(str(len(data)))
-        self.simple_list.contents[:] = [TextLine(i, max_lines, text,
+        self.simple_list.contents[:] = [TextLine(i + 1, max_lines, text,
                                                  self.conf['alt_list'],
                                                  self.conf['line_num_sep_char'],
                                                  self.conf['line_num_sep_width'])

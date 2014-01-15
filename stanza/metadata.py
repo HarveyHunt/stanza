@@ -3,7 +3,7 @@ import plyr
 from stanza import __version__
 
 
-class MetaData():
+class Metadata():
 
     def __init__(self, config):
         self.db = plyr.Database(config['db_path'])

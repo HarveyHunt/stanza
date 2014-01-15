@@ -2,9 +2,8 @@ import os.path
 import imp
 import glob
 
-
 def find_player(conf):
-    player_folder = os.path.join(os.getcwd(), 'players')
+    player_folder = os.path.join(os.getcwd(), 'stanza', 'players')
     conf = {}
     if 'default_player' in conf:
         player = _load_player(conf['default_player'], player_folder)

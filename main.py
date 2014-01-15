@@ -7,7 +7,7 @@ class Stanza():
 
     def __init__(self):
         self.config = config.Config()
-        self.ui = interface.StanzaUI(self.config.interface)
+        self.ui = interface.stanza_ui(self.config.interface)
         self.player = player.find_player(self.config.general)
         self.status = {'artist': None, 'album': None, 'title': None,
                        'vol_left': None, 'vol_right': None, 'playing': False,
@@ -17,7 +17,7 @@ class Stanza():
         if not self.player:
             print('No supported players are running')
             exit()
-        self.md = metadata.MetaData(self.config.general)
+        self.md = metadata.Metadata(self.config.general)
 
     def run(self):
         player_thread = Thread(target=self.monitor_player)
