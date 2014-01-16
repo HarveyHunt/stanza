@@ -32,6 +32,12 @@ class TextLine(urwid.WidgetWrap):
     def selectable(self):
         return False
 
+class PlayerControls(urwid.WidgetWrap):
+    '''
+    A wrap of button widgets that implement the player controls for the
+    media player.
+    '''
+    pass
 
 class Bar(urwid.WidgetWrap):
     '''
